@@ -49,6 +49,7 @@ public class ExtraviadoFragment extends Fragment {
     private RadioButton optFelino;
     private Button btnGuardar;
     private ReporteExtravio unReporte;
+    private TextView nombMascota;
 
 
 
@@ -161,7 +162,7 @@ public class ExtraviadoFragment extends Fragment {
             }
         });
 
-
+        nombMascota = v.findViewById(R.id.nombMascota);
         btnGuardar = v.findViewById(R.id.btnGuardar);
 
         btnFoto = (Button) v.findViewById(R.id.btnFoto);
@@ -187,13 +188,17 @@ public class ExtraviadoFragment extends Fragment {
         if(getArguments()!=null) coordenadas = getArguments().getString("latLng","0;0");
         mascota_coord.setText(coordenadas);
 
-        if(unReporte.isContactoEsDuenio()){
+
+
+        if(this.getTag().equals("optAnimalExtraviado")){
             btnFoto.setEnabled(false);
+            btnFoto.setVisibility(View.GONE);
         }else{
             edtNombreMascota.setEnabled(false);
+            edtNombreMascota.setVisibility(View.GONE);
+            nombMascota.setVisibility(View.GONE);
+
         }
-
-
 
         return v;
     }
@@ -249,31 +254,21 @@ System.out.println("cargar foto "+unReporte.getPathFoto());
 
     }
 
+    public void setFragmentConDuenio(){
+
+    }
 
 
-    public void onSaveInstanceState(Bundle outState) {
+
+    /*public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //outState.putString("reclamoDesc", reclamoDesc.getText().toString());
         //outState.putString("mail", mail.getText().toString());
         //outState.putString("mascota_coord", mascota_coord.getText().toString());
-        outState.putString("pathFoto", unReporte.getPathFoto());
-        listener.guardarReporte(this.unReporte);
-        this.unReporte=null;
-
-
-    }
-
-
-    public void onRestoreInstanceState( Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-       // reclamoDesc.setText(savedInstanceState.getString("reclamoDesc"));
-        //mail.setText(savedInstanceState.getString("mail"));
-       // mascota_coord.setText(savedInstanceState.getString("mascota_coord"));
-        unReporte.setPathFoto(savedInstanceState.getString("pathFoto"));
-
-    }
+       // outState.putString("pathFoto", unReporte.getPathFoto());
 
 
 
+    }*/
 
 }

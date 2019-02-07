@@ -74,7 +74,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                             case R.id.optAnimalExtraviado:
                                 tag = "optAnimalExtraviado";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+                                if (fragment==null){
+                                    System.out.println("################### El framento no existe  ####################");
+                                }else{
+                                    System.out.println("################### El framento SI existe  ####################");
+                                }
+
+
                                 if(fragment==null) {
+
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
                                    // setUnReporteTemp(new ReporteExtravio());
@@ -82,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 }
                                 unReporteTemp.setContactoEsDuenio(true);
                                 ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+                                ((ExtraviadoFragment) fragment).setFragmentConDuenio();
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optAnimalSinDueno:
@@ -95,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 }
                                 unReporteTemp.setContactoEsDuenio(false);
                                 ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+                                ((ExtraviadoFragment) fragment).setFragmentConDuenio();
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optVer:
