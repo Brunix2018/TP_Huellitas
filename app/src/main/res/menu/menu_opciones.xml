@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/optAnimalExtraviado" android:title="Perdí mi Mascota"></item>
+    <item android:id="@+id/optAnimalSinDueno" android:title="Encontré un Peludo"></item>
+    <item android:id="@+id/optVer" android:title="Busqueda de mascotass"></item>
+    <item android:id="@+id/optHistorial" android:title="Mis mascotas Perdidas"></item>
+    <item android:id="@+id/optParecidos" android:title="Creo que vi una mascota perdida"></item>
+</menu>
