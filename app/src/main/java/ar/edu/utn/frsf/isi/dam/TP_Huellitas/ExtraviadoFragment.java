@@ -33,6 +33,7 @@ public class ExtraviadoFragment extends Fragment {
 
 
 
+
     private TextView mascota_coord;
     private Button btnBuscarCoordenadas;
     private Button btnFoto;
@@ -50,10 +51,8 @@ public class ExtraviadoFragment extends Fragment {
     private Button btnGuardar;
     private ReporteExtravio unReporte;
     private TextView nombMascota;
-
-
-
-    //private String pathFoto="";
+    private String pathFoto="";
+    private String fragmentTag;
 
 
     private String[] meses = {"1","2","3","4","5","6","7","8","9","10","11","12"};
@@ -72,19 +71,19 @@ public class ExtraviadoFragment extends Fragment {
     private coordenadasListener listener;
 
     public interface coordenadasListener {
-        public void obtenerCoordenadas();
-        public void sacarFoto();
-        public void cargarGaleria();
-        public void guardarReporte(ReporteExtravio unReporte);
+        public void obtenerCoordenadas(String fragmentTag);
+        public void sacarFoto(String fragmentTag);
+        public void cargarGaleria(String fragmentTag);
+       // public void guardarReporte(ReporteExtravio unReporte);
 
 
     }
 
 
-   /* public void setPathFoto(String pathFoto) {
+    public void setPathFoto(String pathFoto) {
         this.pathFoto = pathFoto;
         cargarFoto();
-    }*/
+    }
 
     public ReporteExtravio getUnReporte() {
         return unReporte;
@@ -118,13 +117,14 @@ public class ExtraviadoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        System.out.println("************Fragmento "+this.getTag()+" Dibujado************");
         View v = inflater.inflate(R.layout.fragmento_animal_extraviado, container, false);
         mascota_coord = v.findViewById(R.id.mascota_coord);
         btnBuscarCoordenadas= v.findViewById(R.id.btnBuscarCoordenadas);
         btnBuscarCoordenadas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.obtenerCoordenadas();
+                listener.obtenerCoordenadas(fragmentTag);
             }
         });
         foto = v.findViewById(R.id.foto);
@@ -151,7 +151,7 @@ public class ExtraviadoFragment extends Fragment {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    listener.cargarGaleria();
+                    listener.cargarGaleria(fragmentTag);
                 } else {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -173,7 +173,8 @@ public class ExtraviadoFragment extends Fragment {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    listener.sacarFoto();
+
+                    listener.sacarFoto(fragmentTag);
                 } else {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -204,12 +205,12 @@ public class ExtraviadoFragment extends Fragment {
     }
 
     private void cargarFoto(){
-System.out.println("cargar foto "+unReporte.getPathFoto());
-        if (!unReporte.getPathFoto().equals("")) {
-         // if (!pathFoto.equals("")) {
+System.out.println("cargar foto "+this.pathFoto);
+       // if (!unReporte.getPathFoto().equals("")) {
+          if (!pathFoto.equals("")) {
             System.out.println("####cargarFoto####");
-            File file = new File(this.unReporte.getPathFoto());
-            //File file = new File(pathFoto);
+           // File file = new File(this.unReporte.getPathFoto());
+            File file = new File(pathFoto);
             //File file2 = new File(this.getUriFoto().getPath());
             Bitmap imageBitmap = null;
             try {
@@ -254,11 +255,36 @@ System.out.println("cargar foto "+unReporte.getPathFoto());
 
     }
 
-    public void setFragmentConDuenio(){
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
 
+        unReporte= new ReporteExtravio();
+        fragmentTag=this.getTag();
+        super.onCreate(savedInstanceState);
+        //inicializar variables a conservar
+        System.out.println("************Fragmento  "+this.getTag()+" creado************");
     }
 
+    @Override
+    public void onPause() {
 
+        super.onPause();
+        // usuario está abandonando el fragmento
+        System.out.println("************Fragmento  "+this.getTag()+" Pausado************");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // fragmento no visible
+        System.out.println("************Fragmento  "+this.getTag()+" Detenido************");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("************Fragmento  "+this.getTag()+" Destruido************");
+    }
 
     /*public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

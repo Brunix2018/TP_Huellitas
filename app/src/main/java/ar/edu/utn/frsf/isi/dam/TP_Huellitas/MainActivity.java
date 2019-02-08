@@ -23,26 +23,28 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
-
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
         MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener {
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private LatLng lat;
-    //private String pathFoto;
+    private String pathFoto;
     private Uri uriFoto;
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
-    private ReporteExtravio unReporteTemp;
+    private String llamadaFragment;
 
-    public void setUnReporteTemp(ReporteExtravio unReporteTemp) {
+
+
+    //private ReporteExtravio unReporteTemp;
+
+  /*  public void setUnReporteTemp(ReporteExtravio unReporteTemp) {
         this.unReporteTemp = unReporteTemp;
     }
 
     public ReporteExtravio getUnReporteTemp() {
         return unReporteTemp;
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +90,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                    // setUnReporteTemp(new ReporteExtravio());
 
                                 }
-                                unReporteTemp.setContactoEsDuenio(true);
-                                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-                                ((ExtraviadoFragment) fragment).setFragmentConDuenio();
+                               // unReporteTemp.setContactoEsDuenio(true);
+                               // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optAnimalSinDueno:
@@ -102,9 +104,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                     //setUnReporteTemp(new ReporteExtravio());
 
                                 }
-                                unReporteTemp.setContactoEsDuenio(false);
-                                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-                                ((ExtraviadoFragment) fragment).setFragmentConDuenio();
+                               // unReporteTemp.setContactoEsDuenio(false);
+                               // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optVer:
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                     }
                 });
 
-        unReporteTemp = new ReporteExtravio();
+        //unReporteTemp = new ReporteExtravio();
 
     }
 
@@ -200,8 +202,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void obtenerCoordenadas() {
-
+    public void obtenerCoordenadas(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Fragment fragment = null;
         String tag = "mapa";
 
@@ -222,7 +224,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void sacarFoto() {
+    public void sacarFoto(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
@@ -243,18 +246,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void cargarGaleria() {
-
+    public void cargarGaleria(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
         startActivityForResult(galleryIntent, SELECT_IMAGE_GALLERY);
 
     }
 
-    @Override
-    public void guardarReporte(ReporteExtravio unReporte) {
-        this.setUnReporteTemp(unReporte);
-    }
+
 
 
     private File createImageFile() throws IOException {
@@ -266,8 +266,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-        //pathFoto = image.getAbsolutePath();
-        this.unReporteTemp.setPathFoto(image.getAbsolutePath());
+        pathFoto = image.getAbsolutePath();
+        //this.unReporteTemp.setPathFoto(image.getAbsolutePath());
 
         return image;
     }
@@ -290,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
         out.close();
         in.close();
-        //pathFoto = image.getAbsolutePath();
-        this.unReporteTemp.setPathFoto(image.getAbsolutePath());
+        pathFoto = image.getAbsolutePath();
+        //this.unReporteTemp.setPathFoto(image.getAbsolutePath());
 
 
     }
@@ -301,21 +301,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_SAVE && resultCode == RESULT_OK) {
 
-            String tag = "optAnimalExtraviado";
-            Fragment fragment =  getSupportFragmentManager().findFragmentByTag(tag);
-            if(fragment==null) {
-                fragment = new ExtraviadoFragment();
+            IniciarFragmentoConImagen(llamadaFragment,pathFoto);
 
-                ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-            }
-            //((ExtraviadoFragment) fragment).setPathFoto(pathFoto);
-            ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.contenido, fragment,tag)
-                    .commitAllowingStateLoss()
-            ;
 
 
 
@@ -327,26 +314,27 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String tag = "optAnimalExtraviado";
-                Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-                if (fragment == null) {
-                    fragment = new ExtraviadoFragment();
-
-                    ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                }
-                //((ExtraviadoFragment) fragment).setUriFoto(imageUri);
-                //((ExtraviadoFragment) fragment).setPathFoto(pathFoto);
-                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.contenido, fragment, tag)
-                        .commitAllowingStateLoss();
+                IniciarFragmentoConImagen(llamadaFragment,pathFoto);
             }
         }
     }
 
+    public void IniciarFragmentoConImagen(String tagFragmento, String PathImagen){
 
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tagFragmento);
+        if (fragment == null) {
+            fragment = new ExtraviadoFragment();
+
+            ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
+        }
+
+        ((ExtraviadoFragment) fragment).setPathFoto(PathImagen);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, tagFragmento)
+                .commitAllowingStateLoss();
+    }
 
 
 }
