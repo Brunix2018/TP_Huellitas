@@ -2,9 +2,6 @@ package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
 public class ReporteExtravio {
     private long id;
-    private int dia;
-    private int mes;
-    private int anio;
     private boolean contactoEsDuenio;
     private String nombreContacto;
     private String telContacto;
@@ -12,6 +9,23 @@ public class ReporteExtravio {
     private String pathFoto;
     private String coodenadas;
     private boolean esgato;
+    private String Fecha;
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setFecha(String fecha) {
+        Fecha = fecha;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getFecha() {
+        return Fecha;
+    }
 
     public ReporteExtravio() {
         this.setContactoEsDuenio(true);
@@ -31,21 +45,7 @@ public class ReporteExtravio {
         this.esgato = esgato;
     }
 
-    public long getId() {
-        return id;
-    }
 
-    public int getDia() {
-        return dia;
-    }
-
-    public int getMes() {
-        return mes;
-    }
-
-    public int getAnio() {
-        return anio;
-    }
 
     public boolean isContactoEsDuenio() {
         return contactoEsDuenio;
@@ -71,21 +71,6 @@ public class ReporteExtravio {
         return coodenadas;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setDia(int dia) {
-        this.dia = dia;
-    }
-
-    public void setMes(int mes) {
-        this.mes = mes;
-    }
-
-    public void setAnio(int anio) {
-        this.anio = anio;
-    }
 
     public void setContactoEsDuenio(boolean contactoEsDuenio) {
         this.contactoEsDuenio = contactoEsDuenio;

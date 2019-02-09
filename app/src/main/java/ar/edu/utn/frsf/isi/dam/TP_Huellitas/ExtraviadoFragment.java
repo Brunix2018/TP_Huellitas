@@ -14,18 +14,19 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
 
@@ -42,9 +43,7 @@ public class ExtraviadoFragment extends Fragment {
     private EditText edtNombreContacto;
     private EditText edtTelContacto;
     private EditText edtNombreMascota;
-    private Spinner lstAnio;
-    private Spinner lstMes;
-    private Spinner lstDia;
+
     private RadioGroup optTipo;
     private RadioButton optCanino;
     private RadioButton optFelino;
@@ -53,18 +52,15 @@ public class ExtraviadoFragment extends Fragment {
     private TextView nombMascota;
     private String pathFoto="";
     private String fragmentTag;
+    private TextView tvFecha;
+    private String unaFecha;
+    private Date hoy;
+    private SimpleDateFormat formatDate;
 
-
-    private String[] meses = {"1","2","3","4","5","6","7","8","9","10","11","12"};
-    private String[] anios = {"2018","2019","2020"};
-    private String[] dias = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31"};
-
-
-
-
-
-
-
+    public void setTvFecha(String unfecha) {
+        unaFecha=unfecha;
+        System.out.println("fecha mal: "+verificarFechaMal(unfecha));
+    }
 
 
     /************** OnNuevoLugarListener *********************/
@@ -74,8 +70,8 @@ public class ExtraviadoFragment extends Fragment {
         public void obtenerCoordenadas(String fragmentTag);
         public void sacarFoto(String fragmentTag);
         public void cargarGaleria(String fragmentTag);
-       // public void guardarReporte(ReporteExtravio unReporte);
-
+        public void guardarReporte(String fragmentTag,ReporteExtravio unReporte);
+        public void iniciarCalendario(String fragmentTag);
 
     }
 
@@ -89,12 +85,12 @@ public class ExtraviadoFragment extends Fragment {
         return unReporte;
     }
 
-    public void setUnReporte(ReporteExtravio unReporte) {
+   /* public void setUnReporte(ReporteExtravio unReporte) {
         this.unReporte = unReporte;
 
         cargarDatos();
         cargarFoto();
-    }
+    }*/
 
     public coordenadasListener getListener() {
         return listener;
@@ -131,18 +127,26 @@ public class ExtraviadoFragment extends Fragment {
         edtNombreContacto = v.findViewById(R.id.edtNombreContacto);
         edtTelContacto = v.findViewById(R.id.edtTelContacto);
         edtNombreMascota = v.findViewById(R.id.edtNombreMascota );
-        lstAnio = v.findViewById(R.id.lstAnio);
-        lstAnio.setAdapter(new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, anios));
-        lstAnio.setSelection(1);
-        lstMes = v.findViewById(R.id.lstMes);
-        lstMes.setAdapter(new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, meses));
-        lstMes.setSelection(Calendar.getInstance().get(Calendar.MONTH));
-        lstDia = v.findViewById(R.id.lstDia);
-        lstDia.setAdapter(new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, dias));
-        lstDia.setSelection(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)-1);
+
+
+        tvFecha= v.findViewById(R.id.tvFecha);
+
+
+        tvFecha.setText(unaFecha);
+
+        tvFecha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.iniciarCalendario(fragmentTag);
+            }
+        });
+
+
         optTipo = v.findViewById(R.id.optTipo);
         optCanino = v.findViewById(R.id.optCanino);
+        optCanino.setChecked(!unReporte.isEsgato());
         optFelino = v.findViewById(R.id.optFelino);
+        optFelino.setChecked(unReporte.isEsgato());
         btnGalleria = v.findViewById(R.id.btnGalleria);
         btnGalleria.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,6 +168,40 @@ public class ExtraviadoFragment extends Fragment {
 
         nombMascota = v.findViewById(R.id.nombMascota);
         btnGuardar = v.findViewById(R.id.btnGuardar);
+        btnGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+               String incompleto="";
+
+                if (mascota_coord.getText().length()==3) incompleto = "Ingrese Coordenadas donde fue visto el animal";
+                if (edtNombreContacto.getText().length()==0) incompleto = "Ingrese un nombre de Contacto";
+                if (edtTelContacto.getText().length()==0) incompleto = "Ingrese un teléfono de contacto";
+                if (edtNombreMascota.getText().length()==0 && (fragmentTag == "optAnimalExtraviado")) incompleto = "Ingrese nombre de la Mascota";
+                if (verificarFechaMal(tvFecha.getText().toString())) incompleto = "La fecha debe ser menor a 6 meses de antiguedad";
+                if (pathFoto.length()==0) incompleto = "Ingrese foto del animal ";
+
+                if (incompleto !=""){
+                    Toast.makeText(getActivity(),incompleto,Toast.LENGTH_LONG).show();
+                }else {
+                    unReporte.setPathFoto(pathFoto);
+                    unReporte.setNombreContacto(mascota_coord.getText().toString());
+                    unReporte.setNombreMascota(edtNombreMascota.getText().toString());
+                    unReporte.setNombreContacto(edtNombreContacto.getText().toString());
+                    unReporte.setTelContacto(edtTelContacto.getText().toString());
+                    unReporte.setEsgato(optFelino.isChecked());
+                    unReporte.setFecha(tvFecha.getText().toString());
+                    Toast.makeText(getActivity(),"Reporte Guardado con éxito",Toast.LENGTH_LONG).show();
+                    vaciarDatos();
+                    listener.guardarReporte(fragmentTag,unReporte);
+
+                }
+
+
+            }
+        });
+
 
         btnFoto = (Button) v.findViewById(R.id.btnFoto);
         btnFoto.setOnClickListener(new View.OnClickListener() {
@@ -186,7 +224,10 @@ public class ExtraviadoFragment extends Fragment {
         });
 
         String coordenadas = "0;0";
-        if(getArguments()!=null) coordenadas = getArguments().getString("latLng","0;0");
+        if(getArguments()!=null) {
+            coordenadas = getArguments().getString("latLng","0;0");
+            getArguments().remove("latLng");
+        }
         mascota_coord.setText(coordenadas);
 
 
@@ -194,15 +235,17 @@ public class ExtraviadoFragment extends Fragment {
         if(this.getTag().equals("optAnimalExtraviado")){
             btnFoto.setEnabled(false);
             btnFoto.setVisibility(View.GONE);
+            unReporte.setContactoEsDuenio(true);
         }else{
             edtNombreMascota.setEnabled(false);
             edtNombreMascota.setVisibility(View.GONE);
             nombMascota.setVisibility(View.GONE);
-
+            unReporte.setContactoEsDuenio(false);
         }
-
+        cargarFoto();
         return v;
     }
+
 
     private void cargarFoto(){
 System.out.println("cargar foto "+this.pathFoto);
@@ -230,26 +273,48 @@ System.out.println("cargar foto "+this.pathFoto);
         }
     }
 
-    private void cargarDatos(){
+    private void vaciarDatos(){
 
-        System.out.println(unReporte.toString());
-        if (!unReporte.getNombreContacto().equals("")) {
+            unReporte= new ReporteExtravio();
             this.edtNombreContacto.setText(unReporte.getNombreContacto());
-        }
-        if (!unReporte.getCoodenadas().equals("")) {
+
             this.mascota_coord.setText(unReporte.getCoodenadas());
-        }
-        if (!unReporte.getNombreMascota().equals("")) {
+
             this.edtNombreMascota.setText(unReporte.getNombreMascota());
-        }
-        if (!unReporte.isEsgato()) {
+
             this.optFelino.setSelected(unReporte.isEsgato());
-        }
-        if (!unReporte.getTelContacto().equals("")) {
+
             this.edtTelContacto.setText(unReporte.getTelContacto());
+
+            pathFoto="";
+            foto.setImageResource(R.drawable.catdog);
+            mascota_coord.setText("0;0");
+            unaFecha= formatDate.format(hoy);
+
+
+
+
+    }
+
+    private boolean verificarFechaMal(String fechaA){
+        // true: fecha mayor a 6 meses o a futuro
+        Date fechA= new Date();
+        try {
+            fechA= formatDate.parse(fechaA);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        if (unReporte.getPathFoto() == null){
-            unReporte.setPathFoto("");
+
+        long diferencia = hoy.getTime()-fechA.getTime();
+        diferencia= diferencia/1000; // milisegundos
+        diferencia= diferencia/60/60; // horas y minutos
+
+
+        System.out.println("diferencia: "+diferencia);
+        if (( diferencia< 0) || (diferencia >4320)){
+            return true;
+        }else{
+            return false;
         }
 
 
@@ -260,6 +325,10 @@ System.out.println("cargar foto "+this.pathFoto);
 
         unReporte= new ReporteExtravio();
         fragmentTag=this.getTag();
+        hoy = new Date();
+        formatDate = new SimpleDateFormat("dd-MM-yyyy");
+        unaFecha=formatDate.format(hoy);
+
         super.onCreate(savedInstanceState);
         //inicializar variables a conservar
         System.out.println("************Fragmento  "+this.getTag()+" creado************");
@@ -286,15 +355,5 @@ System.out.println("cargar foto "+this.pathFoto);
         System.out.println("************Fragmento  "+this.getTag()+" Destruido************");
     }
 
-    /*public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //outState.putString("reclamoDesc", reclamoDesc.getText().toString());
-        //outState.putString("mail", mail.getText().toString());
-        //outState.putString("mascota_coord", mascota_coord.getText().toString());
-       // outState.putString("pathFoto", unReporte.getPathFoto());
-
-
-
-    }*/
 
 }

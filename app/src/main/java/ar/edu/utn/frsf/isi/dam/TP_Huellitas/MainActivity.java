@@ -23,8 +23,10 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
+
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
-        MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener {
+        MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener,CalendarioFragment.calendarioListener {
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private LatLng lat;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         //MapaFragment fragment = new MapaFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.contenido, fragmentInicio)
+                .replace(R.id.contenido, fragmentInicio,"inicio")
                 .commit();
 
         navView.setNavigationItemSelectedListener(
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                             menuItem.setChecked(true);
 
                             getSupportActionBar().setTitle(menuItem.getTitle());
+
                         }
 
                         drawerLayout.closeDrawers();
@@ -183,8 +186,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @Override
     public void coordenadasSeleccionadas(LatLng c) {
-        String tag = "ExtraviadoFragment";
-        Fragment fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+
+        Fragment fragment =  getSupportFragmentManager().findFragmentByTag(llamadaFragment);
         if(fragment==null) {
             fragment = new ExtraviadoFragment();
             //((NuevoReclamoFragment) fragment).setListener(listenerReclamo);
@@ -196,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         fragment.setArguments(bundle);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.contenido, fragment,tag)
+                .replace(R.id.contenido, fragment,llamadaFragment)
                 .commit();
 
     }
@@ -254,7 +257,25 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     }
 
+    @Override
+    public void guardarReporte(String unFragmentTag,ReporteExtravio unReporte) {
 
+        ReporteExtravio reporte = unReporte;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
+        Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
+        if (fragment == null) {
+            fragment = new IntroFragment();
+        }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment,"inicio" )
+                .commitAllowingStateLoss();
+
+
+
+
+    }
 
 
     private File createImageFile() throws IOException {
@@ -337,4 +358,35 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
 
+    public void iniciarCalendario(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
+        String tag = "CalendarioFragment";
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            fragment = new CalendarioFragment();
+
+            ((CalendarioFragment) fragment).setListener(MainActivity.this);
+        }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, tag)
+                .commitAllowingStateLoss();
+    }
+
+    @Override
+    public void enviarFecha(String Fecha) {
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(llamadaFragment);
+        if (fragment == null) {
+            fragment = new CalendarioFragment();
+
+            ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
+        }
+        ((ExtraviadoFragment) fragment).setTvFecha(Fecha);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, llamadaFragment)
+                .commitAllowingStateLoss();
+    }
 }
