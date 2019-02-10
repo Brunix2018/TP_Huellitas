@@ -74,22 +74,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         boolean fragmentTransaction = false;
                         Fragment fragment = null;
                         String tag = "";
+                        boolean fragmentoExiste = true;
                         switch (menuItem.getItemId()) {
                             case R.id.optAnimalExtraviado:
                                 tag = "optAnimalExtraviado";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
-                                if (fragment==null){
-                                    System.out.println("################### El framento no existe  ####################");
-                                }else{
-                                    System.out.println("################### El framento SI existe  ####################");
-                                }
-
 
                                 if(fragment==null) {
 
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                   // setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
+
 
                                 }
                                // unReporteTemp.setContactoEsDuenio(true);
@@ -103,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 if(fragment==null) {
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                    //setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
 
                                 }
                                // unReporteTemp.setContactoEsDuenio(false);
@@ -137,15 +133,24 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         }
 
                         if(fragmentTransaction) {
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.contenido, fragment,tag)
-                                    .addToBackStack(null)
-                                    .commit();
+                            if (fragmentoExiste){
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .commit();
 
-                            menuItem.setChecked(true);
+                                menuItem.setChecked(true);
+                            }else{
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .addToBackStack("inicio")
+                                        .commit();
 
-                            //getSupportActionBar().setTitle(menuItem.getTitle());
+                                menuItem.setChecked(true);
+                                //getSupportActionBar().setTitle(menuItem.getTitle());
+                            }
+
 
 
                         }
@@ -176,12 +181,16 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void onBackPressed() {
         System.out.println("onBackPressed");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
         super.onBackPressed();
+
     }
 
     @Override
     public void onBackStackChanged() {
         System.out.println("onbackStackChanged");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
 
        // shouldDisplayHomeUp();
     }
@@ -271,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         ReporteExtravio reporte = unReporte;
 
+
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
         Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
         if (fragment == null) {
@@ -279,7 +289,13 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contenido, fragment,"inicio" )
+                //.detach(fragment2)
+               // .remove(fragment2)
+               // .addToBackStack(null)
+
                 .commitAllowingStateLoss();
+
+
 
 
 
