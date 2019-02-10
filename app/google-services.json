@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "162044896908",
+    "firebase_url": "https://tphuellitas.firebaseio.com",
+    "project_id": "tphuellitas",
+    "storage_bucket": "tphuellitas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162044896908:android:0186e753624a8814",
+        "android_client_info": {
+          "package_name": "ar.edu.utn.frsf.isi.dam.TP_Huellitas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162044896908-ln62ci33g8jkqn577ke34lnr5kje84c5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ar.edu.utn.frsf.isi.dam.TP_Huellitas",
+            "certificate_hash": "d9109145a6d7f9b57009f90f42a52a1c53e3a730"
+          }
+        },
+        {
+          "client_id": "162044896908-eab901l61va896qr4hujerl943sgvt61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs4tRBm9QBDWVkPmcMgqp2d_BAWMT6gWA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162044896908-eab901l61va896qr4hujerl943sgvt61.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
