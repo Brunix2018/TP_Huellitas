@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
-        shouldDisplayHomeUp();
+        //shouldDisplayHomeUp();
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         navView = (NavigationView)findViewById(R.id.navview);
@@ -145,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
                             menuItem.setChecked(true);
 
-                            getSupportActionBar().setTitle(menuItem.getTitle());
+                            //getSupportActionBar().setTitle(menuItem.getTitle());
+
 
                         }
 
@@ -173,15 +174,23 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void onBackStackChanged() {
-        shouldDisplayHomeUp();
+    public void onBackPressed() {
+        System.out.println("onBackPressed");
+        super.onBackPressed();
     }
 
-    public void shouldDisplayHomeUp(){
+    @Override
+    public void onBackStackChanged() {
+        System.out.println("onbackStackChanged");
+
+       // shouldDisplayHomeUp();
+    }
+
+ /*   public void shouldDisplayHomeUp(){
         //Enable Up button only  if there are entries in the back stack
         boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
-    }
+    }*/
 
 
     @Override
@@ -371,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contenido, fragment, tag)
+                .addToBackStack(null)
                 .commitAllowingStateLoss();
     }
 
