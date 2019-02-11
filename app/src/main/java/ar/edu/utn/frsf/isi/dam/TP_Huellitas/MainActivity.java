@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.DBApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.StorageApi;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
         MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener,CalendarioFragment.calendarioListener {
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
     private String llamadaFragment;
+
 
 
 
@@ -160,6 +163,17 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         return true;
                     }
                 });
+
+
+
+
+        //DBApi api = new DBApi();
+        //api.crearNuevoUsuario();
+        //api.obtenerUsuario();
+        StorageApi storage = new StorageApi();
+        storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
+        System.out.println("RUTA#:"+storage.getRuta());
+
 
         //unReporteTemp = new ReporteExtravio();
 
