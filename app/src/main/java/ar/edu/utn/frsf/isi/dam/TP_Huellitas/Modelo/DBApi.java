@@ -1,6 +1,10 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -14,37 +18,51 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.MainActivity;
+
 public class DBApi {
 
-    private FirebaseFirestore db;
+  /*  private static DBApi INSTANCIA_UNICA=null;
 
-    public DBApi() {
+    public static DBApi getInstance(){
+        if(INSTANCIA_UNICA==null) INSTANCIA_UNICA = new DBApi();
+        return INSTANCIA_UNICA;
+    }*/
+
+    private FirebaseFirestore db;
+    private Context contexto;
+
+    //private DBApi() {
+    public DBApi(Context context) {
         this.db = FirebaseFirestore.getInstance();
+        this.contexto= context;
 
     }
 
-    public void crearNuevoUsuario() {
+    public void crearNuevoUsuario(ReporteExtravio unReporte,String pathString) {
         // Create a new user with a first and last name
-        Map<String, Object> user = new HashMap<>();
-        user.put("first", "Ada");
-        user.put("last", "Lovelace");
-        user.put("born", 1815);
+        ReporteExtravio reporte = unReporte;
+        reporte.setPathFoto(pathString);
 
-        // Add a new document with a generated ID
-        db.collection("users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        System.out.println("DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        System.out.println("Error adding document" + e);
-                    }
-                });
+
+         db.collection("users")
+        .add(reporte)
+        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(contexto,"Reporte Guardado con éxito",Toast.LENGTH_LONG).show();
+                System.out.println("DocumentSnapshot added with ID: " + documentReference.getId());
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(contexto,"No se guardó el reporte",Toast.LENGTH_LONG).show();
+                System.out.println("Error adding document" + e);
+            }
+        });
+
     }
 
 
@@ -66,5 +84,7 @@ public class DBApi {
                         }
                     });
         }
+
+
 
 }

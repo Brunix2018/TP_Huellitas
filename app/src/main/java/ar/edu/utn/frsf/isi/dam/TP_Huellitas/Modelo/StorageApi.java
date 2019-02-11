@@ -1,14 +1,18 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-//import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -17,52 +21,43 @@ import java.io.File;
 
 public class StorageApi {
 
+    private static StorageApi INSTANCIA_UNICA=null;
+
+    public static StorageApi getInstance(Context unContexto){
+        if(INSTANCIA_UNICA==null) INSTANCIA_UNICA = new StorageApi(unContexto);
+        return INSTANCIA_UNICA;
+    }
+
+
     private FirebaseStorage storage;
     private StorageReference storageRef;
-    //private FirebaseAuth auth;
-    public String ruta;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+    private static final String TAG = "StorageApi";
+    public String ruta="vacia";
 
-    public StorageApi() {
+    private DBApi db;
+
+
+
+    public StorageApi(Context unContext) {
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
+        firebaseAuth.signInAnonymously();
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-      //  auth = FirebaseAuth.getInstance();
-       // auth.signInAnonymously();
+        db = new DBApi(unContext);
+
     }
 
 
-  /*  public void subirFoto(String path) {
-        Uri file = Uri.fromFile(new File(path));
-        final StorageReference riversRef = storageRef.child("images/" + file.getLastPathSegment());
 
-        UploadTask uploadTask = riversRef.putFile(file);
-
-        // Register observers to listen for when the download is done or if it fails
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                System.out.println("falla en la subida");
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-           // public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                // ...
-                System.out.println (riversRef.getDownloadUrl().getResult().toString());
-                System.out.println("subida Exitosa");
-            }
-        });
-
-    }*/
-
-    public String getRuta() {
-        return ruta;
-    }
-
-    public void subirFotoObtenerPath(String path) {
+    public void subirFotoObtenerPath(final ReporteExtravio unReporte) {
         // [START upload_get_download_url]
-        Uri file = Uri.fromFile(new File(path));
+        ReporteExtravio reporte= unReporte;
+        Uri file = Uri.fromFile(new File(reporte.getPathFoto()));
+        System.out.println("File:"+file.getPath());
 
         final StorageReference ref = storageRef.child("images/" + file.getLastPathSegment());
         UploadTask uploadTask = ref.putFile(file);
@@ -83,8 +78,8 @@ public class StorageApi {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     ruta=downloadUri.toString();
-                    System.out.println("RUTA:::"+ruta);
-                    System.out.println("subida Exitosa");
+                    db.crearNuevoUsuario(unReporte, ruta);
+                    System.out.println("UNRUTA:"+ruta);
 
                 } else {
                     System.out.println("Problema con la subida");
@@ -130,6 +125,8 @@ public class StorageApi {
 
         // [END upload_get_download_url]
     }*/
+
+
 
 
 }

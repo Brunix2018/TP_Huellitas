@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
     private String llamadaFragment;
+    StorageApi storage;
 
 
 
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         navView = (NavigationView)findViewById(R.id.navview);
         IntroFragment fragmentInicio = new IntroFragment();
+
+
+
 
         //MapaFragment fragment = new MapaFragment();
         getSupportFragmentManager()
@@ -167,12 +171,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
 
 
-        //DBApi api = new DBApi();
-        //api.crearNuevoUsuario();
-        //api.obtenerUsuario();
-        StorageApi storage = new StorageApi();
-        storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
-        System.out.println("RUTA#:"+storage.getRuta());
+
+        storage = new StorageApi(this);
+
+
+       //   System.out.println("RUTA: "+storage.getRuta());
+
 
 
         //unReporteTemp = new ReporteExtravio();
@@ -292,8 +296,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void guardarReporte(String unFragmentTag,ReporteExtravio unReporte) {
 
-        ReporteExtravio reporte = unReporte;
 
+        storage.subirFotoObtenerPath(unReporte);
+
+
+
+        //storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
+
+
+        /*
 
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
         Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
@@ -307,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                // .remove(fragment2)
                // .addToBackStack(null)
 
-                .commitAllowingStateLoss();
+                .commitAllowingStateLoss();*/
 
 
 
