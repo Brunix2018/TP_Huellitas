@@ -19,12 +19,14 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.MyToken;
+
 public class StorageApi {
 
     private static StorageApi INSTANCIA_UNICA=null;
 
-    public static StorageApi getInstance(Context unContexto){
-        if(INSTANCIA_UNICA==null) INSTANCIA_UNICA = new StorageApi(unContexto);
+    public static StorageApi getInstance(Context unContexto, MyToken untoken){
+        if(INSTANCIA_UNICA==null) INSTANCIA_UNICA = new StorageApi(unContexto, untoken);
         return INSTANCIA_UNICA;
     }
 
@@ -40,14 +42,14 @@ public class StorageApi {
 
 
 
-    public StorageApi(Context unContext) {
+    private StorageApi(Context unContext, MyToken untoken) {
 
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         firebaseAuth.signInAnonymously();
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-        db = new DBApi(unContext);
+        db = new DBApi(unContext, untoken);
 
     }
 
@@ -90,8 +92,11 @@ public class StorageApi {
         // [END upload_get_download_url]
     }
 
+    public DBApi getDb() {
+        return db;
+    }
 
-   /* public void subirFotoObtenerPath(String path) {
+    /* public void subirFotoObtenerPath(String path) {
         // [START upload_get_download_url]
         Uri file = Uri.fromFile(new File(path));
 

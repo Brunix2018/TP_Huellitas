@@ -26,6 +26,8 @@ import java.util.Date;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.DBApi;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.StorageApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.MyToken;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.ReportesExpidarosService;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
         MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener,CalendarioFragment.calendarioListener {
@@ -37,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
     private String llamadaFragment;
-    StorageApi storage;
+    private StorageApi storage;
+    private MyToken myToken;
 
 
 
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
                                 fragmentTransaction = true;
                                 break;
-                            case R.id.optHistorial:
+            /*                case R.id.optHistorial:
 
                                 tag="optHistorial";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
@@ -136,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                                                    }
 
                                 fragmentTransaction = true;
-                                break;
+                                break;*/
                         }
 
                         if(fragmentTransaction) {
@@ -172,7 +175,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
 
 
-        storage = new StorageApi(this);
+
+        myToken = new MyToken(this);
+        myToken.run();
+        storage = StorageApi.getInstance(this, myToken);
+        storage.getDb().borrarExpirados();
+
+
+
+
 
 
        //   System.out.println("RUTA: "+storage.getRuta());
@@ -284,6 +295,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
+    public MyToken getMyToken() {
+        return myToken;
+    }
+
     @Override
     public void cargarGaleria(String unFragmentTag) {
         this.llamadaFragment=unFragmentTag;
@@ -299,12 +314,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         storage.subirFotoObtenerPath(unReporte);
 
-
-
         //storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
 
 
-        /*
+
 
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
         Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
@@ -318,12 +331,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                // .remove(fragment2)
                // .addToBackStack(null)
 
-                .commitAllowingStateLoss();*/
-
-
-
-
-
+                .commitAllowingStateLoss();
 
     }
 

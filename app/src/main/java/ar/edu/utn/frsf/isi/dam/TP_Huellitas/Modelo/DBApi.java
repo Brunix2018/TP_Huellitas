@@ -2,7 +2,9 @@ package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +22,10 @@ import java.util.Map;
 
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.MainActivity;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.MyToken;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.ReportesExpidarosService;
+
+import static android.support.constraint.Constraints.TAG;
 
 public class DBApi {
 
@@ -32,11 +38,16 @@ public class DBApi {
 
     private FirebaseFirestore db;
     private Context contexto;
+    private MyToken token;
+
 
     //private DBApi() {
-    public DBApi(Context context) {
+    public DBApi(Context context, MyToken untoken) {
         this.db = FirebaseFirestore.getInstance();
         this.contexto= context;
+        this.token=untoken;
+
+
 
     }
 
@@ -44,9 +55,17 @@ public class DBApi {
         // Create a new user with a first and last name
         ReporteExtravio reporte = unReporte;
         reporte.setPathFoto(pathString);
+        System.out.println("####TOKEN:"+token.getTokenFromPrefs());
+        String tipoReporte;
+        if (reporte.isContactoEsDuenio()){
+            tipoReporte= "Perdidos";
+        }else {
+            tipoReporte= "Encontrados";
+        }
+        reporte.setId(this.token.getTokenFromPrefs());
 
 
-         db.collection("users")
+         db.collection(tipoReporte)
         .add(reporte)
         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
@@ -66,25 +85,44 @@ public class DBApi {
     }
 
 
+    public void borrarExpirados() {
+        db.collection("Perdidos")
+                .whereEqualTo("id", token.getTokenFromPrefs())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                ReporteExtravio report = document.toObject(ReporteExtravio.class);
+                                if(report.isFechaExpirada()){
 
-        public void obtenerUsuario (){
+                                    db.collection("Perdidos").document(document.getId())
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                                    Intent intent = new Intent(contexto, ReportesExpidarosService.class);
+                                                    contexto.startService(intent);
 
-            db.collection("users")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete( Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    System.out.println( document.getId() + " => " + document.getData());
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w(TAG, "Error deleting document", e);
+                                                }
+                                            });
                                 }
-                            } else {
-                                System.out.println( "Error getting documents."+ task.getException());
                             }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
                         }
-                    });
-        }
+                    }
+                });
 
-
+    }
 
 }

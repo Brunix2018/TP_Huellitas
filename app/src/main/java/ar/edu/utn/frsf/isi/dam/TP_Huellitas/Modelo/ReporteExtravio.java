@@ -1,7 +1,11 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ReporteExtravio {
-    private long id;
+    private String id;
     private boolean contactoEsDuenio;
     private String nombreContacto;
     private String telContacto;
@@ -11,7 +15,7 @@ public class ReporteExtravio {
     private boolean esgato;
     private String Fecha;
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -19,7 +23,7 @@ public class ReporteExtravio {
         Fecha = fecha;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -99,5 +103,34 @@ public class ReporteExtravio {
     public String toString(){
         return "nombre Contacto :"+this.nombreContacto+"nombre Mascota :"+this.nombreMascota+"Tel Contacto :"+this.telContacto+"Coordenadas :"+this.coodenadas+"Path Foto :"+this.pathFoto;
     }
+
+    public boolean isFechaExpirada() {
+        // true: fecha mayor a 6 meses o a futuro
+        String fechaA= this.Fecha;
+        Date hoy;
+        SimpleDateFormat formatDate;
+        Date fechA = new Date();
+        hoy = new Date();
+        formatDate = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            fechA = formatDate.parse(fechaA);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        long diferencia = hoy.getTime() - fechA.getTime();
+        diferencia = diferencia / 1000; // milisegundos
+        diferencia = diferencia / 60 / 60; // horas y minutos
+
+
+        System.out.println("diferencia: " + diferencia);
+        if ((diferencia < 0) || (diferencia > 4320)) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
 
 }
