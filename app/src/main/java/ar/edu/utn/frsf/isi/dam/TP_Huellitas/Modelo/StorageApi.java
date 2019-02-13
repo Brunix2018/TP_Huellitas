@@ -30,6 +30,10 @@ public class StorageApi {
         return INSTANCIA_UNICA;
     }
 
+    public static StorageApi getInstance(){
+        return INSTANCIA_UNICA;
+    }
+
 
     private FirebaseStorage storage;
     private StorageReference storageRef;

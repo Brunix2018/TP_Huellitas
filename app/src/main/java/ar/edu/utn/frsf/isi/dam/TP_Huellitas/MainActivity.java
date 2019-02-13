@@ -122,6 +122,14 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 tag="optVer";
 
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+                                if(fragment==null) {
+                                    fragment = new VerAnimalesFragment();
+
+                                    fragmentoExiste = false;
+
+                                }
+                                // unReporteTemp.setContactoEsDuenio(false);
+                                // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
 
                                 fragmentTransaction = true;
                                 break;
