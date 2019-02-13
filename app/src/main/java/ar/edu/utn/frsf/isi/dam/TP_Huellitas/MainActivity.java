@@ -24,25 +24,36 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.DBApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.StorageApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.MyToken;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.ReportesExpidarosService;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
-        MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener {
+        MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener,CalendarioFragment.calendarioListener {
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private LatLng lat;
-    //private String pathFoto;
+    private String pathFoto;
     private Uri uriFoto;
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
-    private ReporteExtravio unReporteTemp;
+    private String llamadaFragment;
+    private StorageApi storage;
+    private MyToken myToken;
 
-    public void setUnReporteTemp(ReporteExtravio unReporteTemp) {
+
+
+
+    //private ReporteExtravio unReporteTemp;
+
+  /*  public void setUnReporteTemp(ReporteExtravio unReporteTemp) {
         this.unReporteTemp = unReporteTemp;
     }
 
     public ReporteExtravio getUnReporteTemp() {
         return unReporteTemp;
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +61,19 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
-        shouldDisplayHomeUp();
+        //shouldDisplayHomeUp();
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         navView = (NavigationView)findViewById(R.id.navview);
         IntroFragment fragmentInicio = new IntroFragment();
 
+
+
+
         //MapaFragment fragment = new MapaFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.contenido, fragmentInicio)
+                .replace(R.id.contenido, fragmentInicio,"inicio")
                 .commit();
 
         navView.setNavigationItemSelectedListener(
@@ -70,18 +84,23 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         boolean fragmentTransaction = false;
                         Fragment fragment = null;
                         String tag = "";
+                        boolean fragmentoExiste = true;
                         switch (menuItem.getItemId()) {
                             case R.id.optAnimalExtraviado:
                                 tag = "optAnimalExtraviado";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+
                                 if(fragment==null) {
+
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                   // setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
+
 
                                 }
-                                unReporteTemp.setContactoEsDuenio(true);
-                                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+                               // unReporteTemp.setContactoEsDuenio(true);
+                               // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optAnimalSinDueno:
@@ -90,11 +109,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 if(fragment==null) {
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                    //setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
 
                                 }
-                                unReporteTemp.setContactoEsDuenio(false);
-                                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+                               // unReporteTemp.setContactoEsDuenio(false);
+                               // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
+
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optVer:
@@ -102,10 +122,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 tag="optVer";
 
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+                                if(fragment==null) {
+                                    fragment = new VerAnimalesFragment();
+
+                                    fragmentoExiste = false;
+
+                                }
+                                // unReporteTemp.setContactoEsDuenio(false);
+                                // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
 
                                 fragmentTransaction = true;
                                 break;
-                            case R.id.optHistorial:
+            /*                case R.id.optHistorial:
 
                                 tag="optHistorial";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
@@ -119,19 +147,30 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                                                    }
 
                                 fragmentTransaction = true;
-                                break;
+                                break;*/
                         }
 
                         if(fragmentTransaction) {
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.contenido, fragment,tag)
-                                    .addToBackStack(null)
-                                    .commit();
+                            if (fragmentoExiste){
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .commit();
 
-                            menuItem.setChecked(true);
+                                menuItem.setChecked(true);
+                            }else{
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .addToBackStack("inicio")
+                                        .commit();
 
-                            getSupportActionBar().setTitle(menuItem.getTitle());
+                                menuItem.setChecked(true);
+                                //getSupportActionBar().setTitle(menuItem.getTitle());
+                            }
+
+
+
                         }
 
                         drawerLayout.closeDrawers();
@@ -140,7 +179,26 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                     }
                 });
 
-        unReporteTemp = new ReporteExtravio();
+
+
+
+
+
+        myToken = new MyToken(this);
+        myToken.run();
+        storage = StorageApi.getInstance(this, myToken);
+        storage.getDb().borrarExpirados();
+
+
+
+
+
+
+       //   System.out.println("RUTA: "+storage.getRuta());
+
+
+
+        //unReporteTemp = new ReporteExtravio();
 
     }
 
@@ -158,21 +216,33 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void onBackStackChanged() {
-        shouldDisplayHomeUp();
+    public void onBackPressed() {
+        System.out.println("onBackPressed");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
+        super.onBackPressed();
+
     }
 
-    public void shouldDisplayHomeUp(){
+    @Override
+    public void onBackStackChanged() {
+        System.out.println("onbackStackChanged");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
+       // shouldDisplayHomeUp();
+    }
+
+ /*   public void shouldDisplayHomeUp(){
         //Enable Up button only  if there are entries in the back stack
         boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
-    }
+    }*/
 
 
     @Override
     public void coordenadasSeleccionadas(LatLng c) {
-        String tag = "ExtraviadoFragment";
-        Fragment fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+
+        Fragment fragment =  getSupportFragmentManager().findFragmentByTag(llamadaFragment);
         if(fragment==null) {
             fragment = new ExtraviadoFragment();
             //((NuevoReclamoFragment) fragment).setListener(listenerReclamo);
@@ -184,14 +254,14 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         fragment.setArguments(bundle);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.contenido, fragment,tag)
+                .replace(R.id.contenido, fragment,llamadaFragment)
                 .commit();
 
     }
 
     @Override
-    public void obtenerCoordenadas() {
-
+    public void obtenerCoordenadas(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Fragment fragment = null;
         String tag = "mapa";
 
@@ -212,7 +282,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void sacarFoto() {
+    public void sacarFoto(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
@@ -232,9 +303,13 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
-    @Override
-    public void cargarGaleria() {
+    public MyToken getMyToken() {
+        return myToken;
+    }
 
+    @Override
+    public void cargarGaleria(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
         startActivityForResult(galleryIntent, SELECT_IMAGE_GALLERY);
@@ -242,8 +317,30 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void guardarReporte(ReporteExtravio unReporte) {
-        this.setUnReporteTemp(unReporte);
+    public void guardarReporte(String unFragmentTag,ReporteExtravio unReporte) {
+
+
+        storage.subirFotoObtenerPath(unReporte);
+
+        //storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
+
+
+
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
+        Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
+        if (fragment == null) {
+            fragment = new IntroFragment();
+        }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment,"inicio" )
+                //.detach(fragment2)
+               // .remove(fragment2)
+               // .addToBackStack(null)
+
+                .commitAllowingStateLoss();
+
     }
 
 
@@ -256,8 +353,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-        //pathFoto = image.getAbsolutePath();
-        this.unReporteTemp.setPathFoto(image.getAbsolutePath());
+        pathFoto = image.getAbsolutePath();
+        //this.unReporteTemp.setPathFoto(image.getAbsolutePath());
 
         return image;
     }
@@ -280,8 +377,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
         out.close();
         in.close();
-        //pathFoto = image.getAbsolutePath();
-        this.unReporteTemp.setPathFoto(image.getAbsolutePath());
+        pathFoto = image.getAbsolutePath();
+        //this.unReporteTemp.setPathFoto(image.getAbsolutePath());
 
 
     }
@@ -291,21 +388,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_SAVE && resultCode == RESULT_OK) {
 
-            String tag = "optAnimalExtraviado";
-            Fragment fragment =  getSupportFragmentManager().findFragmentByTag(tag);
-            if(fragment==null) {
-                fragment = new ExtraviadoFragment();
+            IniciarFragmentoConImagen(llamadaFragment,pathFoto);
 
-                ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-            }
-            //((ExtraviadoFragment) fragment).setPathFoto(pathFoto);
-            ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.contenido, fragment,tag)
-                    .commitAllowingStateLoss()
-            ;
 
 
 
@@ -317,26 +401,59 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String tag = "optAnimalExtraviado";
-                Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-                if (fragment == null) {
-                    fragment = new ExtraviadoFragment();
-
-                    ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                }
-                //((ExtraviadoFragment) fragment).setUriFoto(imageUri);
-                //((ExtraviadoFragment) fragment).setPathFoto(pathFoto);
-                ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.contenido, fragment, tag)
-                        .commitAllowingStateLoss();
+                IniciarFragmentoConImagen(llamadaFragment,pathFoto);
             }
         }
     }
 
+    public void IniciarFragmentoConImagen(String tagFragmento, String PathImagen){
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tagFragmento);
+        if (fragment == null) {
+            fragment = new ExtraviadoFragment();
+
+            ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
+        }
+
+        ((ExtraviadoFragment) fragment).setPathFoto(PathImagen);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, tagFragmento)
+                .commitAllowingStateLoss();
+    }
 
 
+    public void iniciarCalendario(String unFragmentTag) {
+        this.llamadaFragment=unFragmentTag;
+        String tag = "CalendarioFragment";
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            fragment = new CalendarioFragment();
 
+            ((CalendarioFragment) fragment).setListener(MainActivity.this);
+        }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, tag)
+                .addToBackStack(null)
+                .commitAllowingStateLoss();
+    }
+
+    @Override
+    public void enviarFecha(String Fecha) {
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(llamadaFragment);
+        if (fragment == null) {
+            fragment = new CalendarioFragment();
+
+            ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
+        }
+        ((ExtraviadoFragment) fragment).setTvFecha(Fecha);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment, llamadaFragment)
+                .commitAllowingStateLoss();
+    }
 }

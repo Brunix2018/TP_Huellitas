@@ -1,10 +1,11 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ReporteExtravio {
-    private long id;
-    private int dia;
-    private int mes;
-    private int anio;
+    private String id;
     private boolean contactoEsDuenio;
     private String nombreContacto;
     private String telContacto;
@@ -12,6 +13,23 @@ public class ReporteExtravio {
     private String pathFoto;
     private String coodenadas;
     private boolean esgato;
+    private String Fecha;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setFecha(String fecha) {
+        Fecha = fecha;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFecha() {
+        return Fecha;
+    }
 
     public ReporteExtravio() {
         this.setContactoEsDuenio(true);
@@ -31,21 +49,7 @@ public class ReporteExtravio {
         this.esgato = esgato;
     }
 
-    public long getId() {
-        return id;
-    }
 
-    public int getDia() {
-        return dia;
-    }
-
-    public int getMes() {
-        return mes;
-    }
-
-    public int getAnio() {
-        return anio;
-    }
 
     public boolean isContactoEsDuenio() {
         return contactoEsDuenio;
@@ -71,21 +75,6 @@ public class ReporteExtravio {
         return coodenadas;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setDia(int dia) {
-        this.dia = dia;
-    }
-
-    public void setMes(int mes) {
-        this.mes = mes;
-    }
-
-    public void setAnio(int anio) {
-        this.anio = anio;
-    }
 
     public void setContactoEsDuenio(boolean contactoEsDuenio) {
         this.contactoEsDuenio = contactoEsDuenio;
@@ -114,5 +103,34 @@ public class ReporteExtravio {
     public String toString(){
         return "nombre Contacto :"+this.nombreContacto+"nombre Mascota :"+this.nombreMascota+"Tel Contacto :"+this.telContacto+"Coordenadas :"+this.coodenadas+"Path Foto :"+this.pathFoto;
     }
+
+    public boolean isFechaExpirada() {
+        // true: fecha mayor a 6 meses o a futuro
+        String fechaA= this.Fecha;
+        Date hoy;
+        SimpleDateFormat formatDate;
+        Date fechA = new Date();
+        hoy = new Date();
+        formatDate = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            fechA = formatDate.parse(fechaA);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        long diferencia = hoy.getTime() - fechA.getTime();
+        diferencia = diferencia / 1000; // milisegundos
+        diferencia = diferencia / 60 / 60; // horas y minutos
+
+
+        System.out.println("diferencia: " + diferencia);
+        if ((diferencia < 0) || (diferencia > 4320)) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
 
 }
