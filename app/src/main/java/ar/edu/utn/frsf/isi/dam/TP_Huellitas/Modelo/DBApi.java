@@ -156,4 +156,7 @@ public class DBApi {
         return listaReportes;
     }
 
+    public FirebaseFirestore getDb() {
+        return db;
+    }
 }
