@@ -192,7 +192,8 @@ public class ExtraviadoFragment extends Fragment {
                     unReporte.setTelContacto(edtTelContacto.getText().toString());
                     unReporte.setEsgato(optFelino.isChecked());
                     unReporte.setFecha(tvFecha.getText().toString());
-                    Toast.makeText(getActivity(),"Reporte Guardado con éxito",Toast.LENGTH_LONG).show();
+                    unReporte.setCoodenadas(mascota_coord.getText().toString());
+
                     vaciarDatos();
                     listener.guardarReporte(fragmentTag,unReporte);
 
@@ -275,16 +276,16 @@ System.out.println("cargar foto "+this.pathFoto);
 
     private void vaciarDatos(){
 
-            unReporte= new ReporteExtravio();
-            this.edtNombreContacto.setText(unReporte.getNombreContacto());
 
-            this.mascota_coord.setText(unReporte.getCoodenadas());
+            this.edtNombreContacto.setText("");
 
-            this.edtNombreMascota.setText(unReporte.getNombreMascota());
+            this.mascota_coord.setText("0;0");
 
-            this.optFelino.setSelected(unReporte.isEsgato());
+            this.edtNombreMascota.setText("");
 
-            this.edtTelContacto.setText(unReporte.getTelContacto());
+            this.optFelino.setSelected(true);
+
+            this.edtTelContacto.setText("");
 
             pathFoto="";
             foto.setImageResource(R.drawable.catdog);

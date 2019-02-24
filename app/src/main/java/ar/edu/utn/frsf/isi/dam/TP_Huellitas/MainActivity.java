@@ -24,6 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.DBApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.StorageApi;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.MyToken;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Notificaciones.ReportesExpidarosService;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
         MapaFragment.OnMapaListener, ExtraviadoFragment.coordenadasListener,CalendarioFragment.calendarioListener {
@@ -35,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     static final int SELECT_IMAGE_GALLERY = 1;
     static final int REQUEST_IMAGE_SAVE = 2;
     private String llamadaFragment;
+    private StorageApi storage;
+    private MyToken myToken;
+
 
 
 
@@ -60,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         navView = (NavigationView)findViewById(R.id.navview);
         IntroFragment fragmentInicio = new IntroFragment();
 
+
+
+
         //MapaFragment fragment = new MapaFragment();
         getSupportFragmentManager()
                 .beginTransaction()
@@ -74,22 +84,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         boolean fragmentTransaction = false;
                         Fragment fragment = null;
                         String tag = "";
+                        boolean fragmentoExiste = true;
                         switch (menuItem.getItemId()) {
                             case R.id.optAnimalExtraviado:
                                 tag = "optAnimalExtraviado";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
-                                if (fragment==null){
-                                    System.out.println("################### El framento no existe  ####################");
-                                }else{
-                                    System.out.println("################### El framento SI existe  ####################");
-                                }
-
 
                                 if(fragment==null) {
 
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                   // setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
+
 
                                 }
                                // unReporteTemp.setContactoEsDuenio(true);
@@ -103,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 if(fragment==null) {
                                     fragment = new ExtraviadoFragment();
                                     ((ExtraviadoFragment) fragment).setListener(MainActivity.this);
-                                    //setUnReporteTemp(new ReporteExtravio());
+                                    fragmentoExiste = false;
 
                                 }
                                // unReporteTemp.setContactoEsDuenio(false);
@@ -116,10 +122,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 tag="optVer";
 
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+                                if(fragment==null) {
+                                    fragment = new VerAnimalesFragment();
+
+                                    fragmentoExiste = false;
+
+                                }
+                                // unReporteTemp.setContactoEsDuenio(false);
+                                // ((ExtraviadoFragment) fragment).setUnReporte(unReporteTemp);
 
                                 fragmentTransaction = true;
                                 break;
-                            case R.id.optHistorial:
+            /*                case R.id.optHistorial:
 
                                 tag="optHistorial";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
@@ -133,19 +147,28 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                                                    }
 
                                 fragmentTransaction = true;
-                                break;
+                                break;*/
                         }
 
                         if(fragmentTransaction) {
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.contenido, fragment,tag)
-                                    .addToBackStack(null)
-                                    .commit();
+                            if (fragmentoExiste){
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .commit();
 
-                            menuItem.setChecked(true);
+                                menuItem.setChecked(true);
+                            }else{
+                                getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.contenido, fragment,tag)
+                                        .addToBackStack("inicio")
+                                        .commit();
 
-                            //getSupportActionBar().setTitle(menuItem.getTitle());
+                                menuItem.setChecked(true);
+                                //getSupportActionBar().setTitle(menuItem.getTitle());
+                            }
+
 
 
                         }
@@ -155,6 +178,25 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         return true;
                     }
                 });
+
+
+
+
+
+
+        myToken = new MyToken(this);
+        myToken.run();
+        storage = StorageApi.getInstance(this, myToken);
+        storage.getDb().borrarExpirados();
+
+
+
+
+
+
+       //   System.out.println("RUTA: "+storage.getRuta());
+
+
 
         //unReporteTemp = new ReporteExtravio();
 
@@ -176,12 +218,16 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void onBackPressed() {
         System.out.println("onBackPressed");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
         super.onBackPressed();
+
     }
 
     @Override
     public void onBackStackChanged() {
         System.out.println("onbackStackChanged");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
 
        // shouldDisplayHomeUp();
     }
@@ -257,6 +303,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
+    public MyToken getMyToken() {
+        return myToken;
+    }
+
     @Override
     public void cargarGaleria(String unFragmentTag) {
         this.llamadaFragment=unFragmentTag;
@@ -269,7 +319,13 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void guardarReporte(String unFragmentTag,ReporteExtravio unReporte) {
 
-        ReporteExtravio reporte = unReporte;
+
+        storage.subirFotoObtenerPath(unReporte);
+
+        //storage.subirFotoObtenerPath("/storage/emulated/0/Android/data/ar.edu.utn.frsf.isi.dam.TP_Huellitas/files/Pictures/JPEG_20190210_212102_7358263715635031331.jpg");
+
+
+
 
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("inicio");
         Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(unFragmentTag);
@@ -279,10 +335,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contenido, fragment,"inicio" )
+                //.detach(fragment2)
+               // .remove(fragment2)
+               // .addToBackStack(null)
+
                 .commitAllowingStateLoss();
-
-
-
 
     }
 
