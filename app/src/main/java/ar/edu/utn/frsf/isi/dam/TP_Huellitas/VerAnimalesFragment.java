@@ -75,11 +75,11 @@ public class VerAnimalesFragment extends Fragment {
 
         optTipoBusqueda = v.findViewById(R.id.optTipoBusqueda);
         optEncontradas = v.findViewById(R.id.optEncontradas);
-        optEncontradas.setSelected(true);
+        optEncontradas.setChecked(true);
         optPerdidas = v.findViewById(R.id.optPerdidas);
 
         optBusquedaFelino = v.findViewById(R.id.optBusquedaFelino);
-        optBusquedaFelino.setSelected(true);
+        optBusquedaFelino.setChecked(true);
         optBusquedaCanino = v.findViewById(R.id.optBusquedaCanino);
         listView= v.findViewById(R.id.listView);
 
