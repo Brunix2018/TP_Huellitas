@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.MainActivity;
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.R;
 
 
 public class ReportesReceiver extends BroadcastReceiver {
@@ -37,6 +38,7 @@ public class ReportesReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, destino, PendingIntent.FLAG_UPDATE_CURRENT);
 
             notificarEstado = new NotificationCompat.Builder(context, "CANAL01")
+                    .setSmallIcon(R.drawable.icono)
                     .setContentTitle("Novedades en busquedas de Mascotas")
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(detalle))

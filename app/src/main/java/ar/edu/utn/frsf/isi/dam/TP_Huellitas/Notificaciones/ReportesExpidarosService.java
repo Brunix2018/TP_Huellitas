@@ -14,7 +14,7 @@ public class ReportesExpidarosService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        System.out.println("onHandleIntent");
         Runnable r = new Runnable() {
             @Override
             public void run() {
