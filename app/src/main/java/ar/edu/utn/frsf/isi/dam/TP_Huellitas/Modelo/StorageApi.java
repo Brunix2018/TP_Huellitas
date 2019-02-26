@@ -100,6 +100,34 @@ public class StorageApi {
         return db;
     }
 
+    public void borrarFoto(String path){
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+
+
+        int a= path.indexOf("%")+3;
+        int b= path.indexOf("?");
+        String name= path.substring(a,b);
+
+
+// Create a reference to the file to delete
+        StorageReference desertRef = storageRef.child("images/"+name);
+
+// Delete the file
+        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+            }
+        });
+    }
+
+
     /* public void subirFotoObtenerPath(String path) {
         // [START upload_get_download_url]
         Uri file = Uri.fromFile(new File(path));
