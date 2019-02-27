@@ -118,6 +118,44 @@ public class DBApi {
                                                     Log.w(TAG, "Error deleting document", e);
                                                 }
                                             });
+                                    StorageApi.getInstance().borrarFoto(report.getPathFoto());
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+        db.collection("Encontrados")
+                .whereEqualTo("id", token.getTokenFromPrefs())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                ReporteExtravio report = document.toObject(ReporteExtravio.class);
+                                if(report.isFechaExpirada()){
+
+                                    db.collection("Encontrados").document(document.getId())
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                                    Intent intent = new Intent(contexto, ReportesExpidarosService.class);
+                                                    contexto.startService(intent);
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w(TAG, "Error deleting document", e);
+                                                }
+                                            });
+                                    StorageApi.getInstance().borrarFoto(report.getPathFoto());
                                 }
                             }
                         } else {

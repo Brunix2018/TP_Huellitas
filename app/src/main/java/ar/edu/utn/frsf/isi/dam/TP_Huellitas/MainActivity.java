@@ -1,7 +1,10 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        createNotificationChannel();
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
         //shouldDisplayHomeUp();
@@ -188,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         myToken.run();
         storage = StorageApi.getInstance(this, myToken);
         storage.getDb().borrarExpirados();
+
+
 
 
 
@@ -456,4 +462,22 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .replace(R.id.contenido, fragment, llamadaFragment)
                 .commitAllowingStateLoss();
     }
+
+
+    private void createNotificationChannel() {
+// Crear el canal de notificaciones pero solo para API 26 io superior
+// dado que NotificationChannel es una clase nueva que no está incluida
+// en las librerías de soporte qeu brindan compatibilidad hacía atrás
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.canal_estado_nombre);
+            String description = getString(R.string.canal_estado_descr);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("CANAL01", name, importance);
+            channel.setDescription(description);
+// Registrar el canal en el sistema
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 }
