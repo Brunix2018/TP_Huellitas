@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.List.ReporteAdapter;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.DBApi;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.StorageApi;
@@ -478,6 +479,30 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+
+    public void verDetalles(ReporteExtravio unReporte) {
+
+        String tag = "detalles";
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            fragment = new DetallesFragment();
+        }
+
+
+        Fragment fragment2 =  getSupportFragmentManager().findFragmentByTag("optVer");
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("reporte",unReporte);
+        fragment.setArguments(bundle);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.contenido, fragment)
+                .hide(fragment2)
+                //.replace(fragment2.getId(), fragment, tag)
+                .addToBackStack(null)
+                .commitAllowingStateLoss();
     }
 
 }

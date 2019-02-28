@@ -64,6 +64,7 @@ public class VerAnimalesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         storage= StorageApi.getInstance();
+        setRetainInstance(true);
 
 
     }

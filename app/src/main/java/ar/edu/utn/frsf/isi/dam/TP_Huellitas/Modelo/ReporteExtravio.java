@@ -1,10 +1,13 @@
 package ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ReporteExtravio {
+public class ReporteExtravio implements Parcelable {
     private String id;
     private boolean contactoEsDuenio;
     private String nombreContacto;
@@ -14,6 +17,30 @@ public class ReporteExtravio {
     private String coodenadas;
     private boolean esgato;
     private String Fecha;
+
+    protected ReporteExtravio(Parcel in) {
+        id = in.readString();
+        contactoEsDuenio = in.readByte() != 0;
+        nombreContacto = in.readString();
+        telContacto = in.readString();
+        nombreMascota = in.readString();
+        pathFoto = in.readString();
+        coodenadas = in.readString();
+        esgato = in.readByte() != 0;
+        Fecha = in.readString();
+    }
+
+    public static final Creator<ReporteExtravio> CREATOR = new Creator<ReporteExtravio>() {
+        @Override
+        public ReporteExtravio createFromParcel(Parcel in) {
+            return new ReporteExtravio(in);
+        }
+
+        @Override
+        public ReporteExtravio[] newArray(int size) {
+            return new ReporteExtravio[size];
+        }
+    };
 
     public void setId(String id) {
         this.id = id;
@@ -133,4 +160,21 @@ public class ReporteExtravio {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeByte((byte) (contactoEsDuenio ? 1 : 0));
+        dest.writeString(nombreContacto);
+        dest.writeString(telContacto);
+        dest.writeString(nombreMascota);
+        dest.writeString(pathFoto);
+        dest.writeString(coodenadas);
+        dest.writeByte((byte) (esgato ? 1 : 0));
+        dest.writeString(Fecha);
+    }
 }
