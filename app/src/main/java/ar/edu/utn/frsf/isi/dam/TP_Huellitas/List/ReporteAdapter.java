@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import ar.edu.utn.frsf.isi.dam.TP_Huellitas.MainActivity;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.Modelo.ReporteExtravio;
 import ar.edu.utn.frsf.isi.dam.TP_Huellitas.R;
 
@@ -23,6 +24,7 @@ public class ReporteAdapter extends ArrayAdapter<ReporteExtravio> {
 
     private Context ctx;
     private List<ReporteExtravio> listaReportes;
+    private ReporteExtravio unRporte;
 
     public ReporteAdapter(Context context,List<ReporteExtravio> objects) {
         super(context, 0, objects);
@@ -48,9 +50,22 @@ public class ReporteAdapter extends ArrayAdapter<ReporteExtravio> {
             holder = (ReporteHolder) fila.getTag();
         }
 
-        ReporteExtravio unRporte = super.getItem(position);
+        unRporte = super.getItem(position);
 
         holder.tbFecha.setText(unRporte.getFecha());
+        holder.btnDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (ctx.getClass().equals(MainActivity.class)) {
+                    ((MainActivity) ctx).verDetalles(unRporte);
+                }
+
+            }
+        });
+
+
+
         new DownLoadImageTask(holder.foto).execute(unRporte.getPathFoto());
 
 
